@@ -141,3 +141,19 @@ try {
 
 
 ```
+
+## PowerShell list installed Applications
+
+```bash
+try {
+	if ($IsLinux) {
+		& snap list
+	} else {
+		Get-AppxPackage | Select-Object Name,Version | Format-Table -autoSize
+	}
+	exit 0 # success
+} catch {
+	"⚠️ Error in line $($_.InvocationInfo.ScriptLineNumber): $($Error[0])"
+	exit 1
+}
+```
