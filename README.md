@@ -180,3 +180,28 @@ Function Monitor-ServerPerformance {
 }
 
 ```
+
+## Check Firewall & Defender
+
+```bash
+if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Warning "You need to run this script as an Administrator"
+    Exit
+}
+
+$firewallStatus = Get-NetFirewallProfile | Select Name, Enabled
+if ($firewallStatus.Enabled -eq 'True') {
+    Write-Host "Windows Firewall is enabled."
+} else {
+    Write-Host "Windows Firewall is not enabled. Please enable it for improved security."
+}
+
+# Example: Checking if antivirus is installed and up to date
+$antivirusStatus = Get-WmiObject -Namespace "root/SecurityCenter2" -Class AntiVirusProduct | Select DisplayName, ProductState
+if ($antivirusStatus -ne $null) {
+    Write-Host "Antivirus software found: $($antivirusStatus.DisplayName)"
+} else {
+    Write-Host "No antivirus software found. Install an antivirus program for better security."
+}
+
+```
