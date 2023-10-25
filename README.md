@@ -157,3 +157,26 @@ try {
 	exit 1
 }
 ```
+
+## PowerShell monitor a server
+
+```bash
+Function Monitor-ServerPerformance {
+    param (
+        [string]$ServerName
+    )
+    
+    $cpuUsage = Get-WmiObject Win32_Processor -ComputerName $ServerName | Measure-Object -Property LoadPercentage -Average | Select Average
+    $memoryUsage = Get-WmiObject Win32_OperatingSystem -ComputerName $ServerName | Select-Object @{Name = "MemoryUsage"; Expression = {("{0:N2}" -f ((($_.TotalVisibleMemorySize - $_.FreePhysicalMemory) / $_.TotalVisibleMemorySize) * 100))}}
+    $diskUsage = Get-WmiObject Win32_LogicalDisk -Filter "DriveType=3" -ComputerName $ServerName | Select-Object DeviceID, @{Name = "FreeSpace(GB)"; Expression = {[math]::Round($_.FreeSpace / 1GB, 2)}}, @{Name = "Size(GB)"; Expression = {[math]::Round($_.Size / 1GB, 2)}}
+
+    Write-Host "Server Performance Metrics for $ServerName :"
+    Write-Host "CPU Usage: $($cpuUsage.Average) %"
+    Write-Host "Memory Usage: $($memoryUsage.MemoryUsage) %"
+    Write-Host "Disk Usage:"
+    $diskUsage | ForEach-Object {
+        Write-Host "Drive $($_.DeviceID): Free Space $($($_.'FreeSpace(GB)')) GB, Total Size $($($_.'Size(GB)')) GB"
+    }
+}
+
+```
