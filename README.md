@@ -3,13 +3,9 @@
 
 This is my small collection of useful Scripts.
 
-  
-
 ## Python connect to SQL
 
 In this example we connect to a SQL Server and submit a query.
-
-  
 
 ```bash
 
@@ -130,4 +126,37 @@ if ($antivirusStatus -ne $null) {
     Write-Host "No antivirus software found. Install an antivirus program for better security."
 }
 
+```
+
+## Basic Windows Cleanup
+
+```bash
+
+if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Warning "You need to run this script as an Administrator"
+    Exit
+}
+
+# Clean up temporary files
+Write-Host "Cleaning up temporary files..."
+Remove-Item -Path "$env:TEMP\*" -Force -Recurse
+Remove-Item -Path "$env:windir\temp\*" -Force -Recurse
+
+# Clear Recycle Bin
+Write-Host "Emptying Recycle Bin..."
+Clear-RecycleBin -Force
+
+# Clean up Windows update files
+Write-Host "Cleaning up Windows update files..."
+Remove-Item -Path "$env:windir\SoftwareDistribution\Download\*" -Force -Recurse
+
+# Clear DNS cache
+Write-Host "Clearing DNS cache..."
+ipconfig /flushdns
+
+# Remove Windows error reporting files
+Write-Host "Removing Windows error reporting files..."
+Remove-Item -Path "$env:LOCALAPPDATA\CrashDumps\*" -Force -Recurse
+
+Write-Host "System cleanup complete."
 ```
