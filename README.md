@@ -7,8 +7,6 @@ This is my small collection of useful Scripts.
 
 ## Python connect to SQL
 
-  
-
 In this example we connect to a SQL Server and submit a query.
 
   
@@ -70,78 +68,6 @@ print('Rows inserted: ' + str(count))
 
 ```
 
-
-## PowerShell check CPU Temperature
-
-```bash
-function GetCPUTemperatureInCelsius {
-	$Temp = 99999.9 # unsupported
-	if ($IsLinux) {
-		if (Test-Path "/sys/class/thermal/thermal_zone0/temp" -pathType leaf) {
-			[int]$IntTemp = Get-Content "/sys/class/thermal/thermal_zone0/temp"
-			$Temp = [math]::round($IntTemp / 1000.0, 1)
-		}
-	} else {
-		$Objects = Get-WmiObject -Query "SELECT * FROM Win32_PerfFormattedData_Counters_ThermalZoneInformation" -Namespace "root/CIMV2"
-		foreach ($Obj in $Objects) {
-			$HiPrec = $Obj.HighPrecisionTemperature
-			$Temp = [math]::round($HiPrec / 100.0, 1)
-		}
-	}
-	return $Temp;
-}
-
-try {
-	$Temp = GetCPUTemperatureInCelsius
-	if ($Temp -eq 99999.9) {
-		"⚠️ CPU temperature query is unsupported."
-	} elseif ($Temp -gt 80) {
-		"⚠️ CPU is too hot at $($Temp)°C!"
-	} elseif ($Temp -gt 50) {
-		"✅ CPU is $($Temp)°C hot."
-	} elseif ($Temp -gt 0) {
-		"✅ CPU is $($Temp)°C warm."
-	} elseif ($Temp -gt -20) {
-		"✅ CPU is $($Temp)°C cold."
-	} else {
-		"⚠️ CPU is too cold at $($Temp)°C!"
-	}
-	exit 0 # success
-} catch {
-	"⚠️ Error in line $($_.InvocationInfo.ScriptLineNumber): $($Error[0])"
-	exit 1
-}
-
-```
-
-
-## PowerShell download a File
-
-```bash
-param([string]$URL = "")
-
-try {
-	if ($URL -eq "") { $URL = read-host "Enter file URL to download" }
-
-	$StopWatch = [system.diagnostics.stopwatch]::startNew()
-
-	& wget --version
-	if ($lastExitCode -ne "0") { throw "Can't execute 'wget' - make sure wget is installed and available" }
-
-	& wget --mirror --convert-links --adjust-extension --page-requisites --no-parent $URL --directory-prefix . --no-verbose
-	if ($lastExitCode -ne "0") { throw "Can't execute 'wget --mirror $URL'" }
-
-	[int]$Elapsed = $StopWatch.Elapsed.TotalSeconds
-	"✔️ downloaded file from $URL in $Elapsed sec"
-	exit 0 # success
-} catch {
-	"⚠️ Error in line $($_.InvocationInfo.ScriptLineNumber): $($Error[0])"
-	exit 1
-}
-
-
-```
-
 ## PowerShell list installed Applications
 
 ```bash
@@ -153,7 +79,7 @@ try {
 	}
 	exit 0 # success
 } catch {
-	"⚠️ Error in line $($_.InvocationInfo.ScriptLineNumber): $($Error[0])"
+	"Error in line $($_.InvocationInfo.ScriptLineNumber): $($Error[0])"
 	exit 1
 }
 ```
